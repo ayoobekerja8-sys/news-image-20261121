@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
-"""Renders entry.png - a one-page newspaper front page for Saturday 21 November 2026.
+"""Renders entry.png: a one-page newspaper front page dated Saturday 21 November 2026.
 
-Deterministic: no clock, no randomness, no network, no dict-order dependence.
+Determinism contract: repeated runs on the same machine with the same Pillow and
+font files must emit byte-identical PNGs. The program reads no clock, uses no
+randomness, opens no network, and never iterates an unordered mapping, so every
+pixel, coordinate and byte of output depends only on the literals in this file.
 Usage: python3 draw.py [output.png]
 """
 
@@ -749,6 +752,7 @@ def main(out_path="entry.png"):
     M = 16
     W = S - 2 * M
     R = S - M
+    HEAD_LH = 12.2          # headline leading, shared by the wrap check and the paragraph
 
     # ------------------------------------------------ top rail
     c.spaced(M, 13.2, "THE WORLD IN ONE DAY", F(11.4, "xbold"), RED, 1.7)
@@ -804,12 +808,12 @@ def main(out_path="entry.png"):
         if len(hl_lines) > 2:
             raise SystemExit("headline too long: %r" % hl)
         hy = y0 + 63
-        para(c, x0 + 6, hy, hl_lines, hf, INK, 12.2)
+        para(c, x0 + 6, hy, hl_lines, hf, INK, HEAD_LH)
         bf = F(9.7, "sans")
         bl = wrap(body, bf, cw - 12)
         if len(bl) > 3:
             raise SystemExit("body too long (%d lines): %r" % (len(bl), body))
-        byy = hy + len(hl_lines) * 12.2 + 2.6
+        byy = hy + len(hl_lines) * HEAD_LH + 2.6
         para(c, x0 + 6, byy, bl, bf, (50, 46, 39), 10.6)
         if byy + len(bl) * 10.6 > y0 + ch - 3:
             raise SystemExit("feature %d overflows" % n)
